@@ -58,8 +58,118 @@ function requestHandler(req, res) {
                 res.end(JSON.stringify({ message: "Error interno del servidor" }));
             }
         });
-    } 
-    // Puedes continuar agregando las rutas para PUT, DELETE, y las rutas para profesores aquí...
+    } else if (url.startsWith('/alumnos/') && method === 'PUT') {
+        const id = parseInt(url.split('/')[2]);
+        let body = '';
+        req.on('data', chunk => body += chunk);
+        req.on('end', () => {
+            try {
+                const alumnoActualizado = JSON.parse(body);
+                if (validarAlumno(alumnoActualizado)) {
+                    const index = alumnos.findIndex(a => a.id === id);
+                    if (index !== -1) {
+                        alumnos[index] = alumnoActualizado;
+                        res.writeHead(200, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify(alumnoActualizado));
+                    } else {
+                        res.writeHead(404, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ message: "Alumno no encontrado" }));
+                    }
+                } else {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ message: "Datos de alumno inválidos" }));
+                }
+            } catch (error) {
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ message: "Error interno del servidor" }));
+            }
+        });
+    } else if (url.startsWith('/alumnos/') && method === 'DELETE') {
+        const id = parseInt(url.split('/')[2]);
+        const index = alumnos.findIndex(a => a.id === id);
+        if (index !== -1) {
+            const eliminado = alumnos.splice(index, 1)[0];
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify(eliminado));
+        } else {
+            res.writeHead(404, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ message: "Alumno no encontrado" }));
+        }
+    }
+
+    // Rutas para profesores
+    else if (url === '/profesores' && method === 'GET') {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(profesores));
+    } else if (url.startsWith('/profesores/') && method === 'GET') {
+        const id = parseInt(url.split('/')[2]);
+        const profesor = profesores.find(p => p.id === id);
+        if (profesor) {
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify(profesor));
+        } else {
+            res.writeHead(404, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ message: "Profesor no encontrado" }));
+        }
+    } else if (url === '/profesores' && method === 'POST') {
+        let body = '';
+        req.on('data', chunk => body += chunk);
+        req.on('end', () => {
+            try {
+                const nuevoProfesor = JSON.parse(body);
+                if (validarProfesor(nuevoProfesor)) {
+                    profesores.push(nuevoProfesor);
+                    res.writeHead(201, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify(nuevoProfesor));
+                } else {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ message: "Datos de profesor inválidos" }));
+                }
+            } catch (error) {
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ message: "Error interno del servidor" }));
+            }
+        });
+    } else if (url.startsWith('/profesores/') && method === 'PUT') {
+        const id = parseInt(url.split('/')[2]);
+        let body = '';
+        req.on('data', chunk => body += chunk);
+        req.on('end', () => {
+            try {
+                const profesorActualizado = JSON.parse(body);
+                if (validarProfesor(profesorActualizado)) {
+                    const index = profesores.findIndex(p => p.id === id);
+                    if (index !== -1) {
+                        profesores[index] = profesorActualizado;
+                        res.writeHead(200, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify(profesorActualizado));
+                    } else {
+                        res.writeHead(404, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ message: "Profesor no encontrado" }));
+                    }
+                } else {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ message: "Datos de profesor inválidos" }));
+                }
+            } catch (error) {
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ message: "Error interno del servidor" }));
+            }
+        });
+    } else if (url.startsWith('/profesores/') && method === 'DELETE') {
+        const id = parseInt(url.split('/')[2]);
+        const index = profesores.findIndex(p => p.id === id);
+        if (index !== -1) {
+            const eliminado = profesores.splice(index, 1)[0];
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify(eliminado));
+        } else {
+            res.writeHead(404, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ message: "Profesor no encontrado" }));
+        }
+    }
+
+    // Ruta no encontrada
     else {
         res.writeHead(404, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ message: "Ruta no encontrada" }));
