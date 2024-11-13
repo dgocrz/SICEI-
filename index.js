@@ -178,6 +178,6 @@ function requestHandler(req, res) {
 
 // Configuración del servidor HTTP
 const httpServer = http.createServer(requestHandler);
-httpServer.listen(80, () => {
-    console.log('Servidor HTTP en ejecución en http://localhost:80');
+httpServer.listen(3000, () => {
+    console.log('Servidor HTTP en ejecución en http://localhost:3000');
 });
